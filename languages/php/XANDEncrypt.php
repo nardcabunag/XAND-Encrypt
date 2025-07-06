@@ -81,6 +81,29 @@ class XANDEncrypt {
     }
 
     /**
+     * Layer 1: Reverse bitwise scrambling
+     */
+    private function layer1Unscramble($data, $key) {
+        $result = '';
+        $dataLength = strlen($data);
+        $keyLength = strlen($key);
+        
+        for ($i = 0; $i < $dataLength; $i++) {
+            $keyByte = ord($key[$i % $keyLength]);
+            $dataByte = ord($data[$i]);
+            
+            // Reverse the bitwise operations
+            $unscrambled = $dataByte ^ ((($keyByte << 1) | ($keyByte >> 7)) & 0xFF);
+            $unscrambled = (($unscrambled >> 3) | ($unscrambled << 5)) & 0xFF; // Rotate right by 3
+            $unscrambled = $unscrambled ^ $keyByte;
+            
+            $result .= chr($unscrambled);
+        }
+        
+        return $result;
+    }
+
+    /**
      * Layer 2: Advanced bit manipulation
      */
     private function layer2Manipulate($data, $key) {
@@ -104,6 +127,33 @@ class XANDEncrypt {
             $manipulated = $manipulated ^ (($keyByte + $i) & 0xFF);
             
             $result .= chr($manipulated);
+        }
+        
+        return $result;
+    }
+
+    /**
+     * Layer 2: Reverse advanced bit manipulation
+     */
+    private function layer2Unmanipulate($data, $key) {
+        $result = '';
+        $dataLength = strlen($data);
+        $keyLength = strlen($key);
+        
+        for ($i = 0; $i < $dataLength; $i++) {
+            $keyByte = ord($key[$i % $keyLength]);
+            $dataByte = ord($data[$i]);
+            
+            // Reverse the position-dependent XOR
+            $unmanipulated = $dataByte ^ (($keyByte + $i) & 0xFF);
+            
+            // Reverse the bit rotation
+            $rotation = ($i + $keyByte) % 8;
+            if ($rotation > 0) {
+                $unmanipulated = (($unmanipulated >> $rotation) | ($unmanipulated << (8 - $rotation))) & 0xFF;
+            }
+            
+            $result .= chr($unmanipulated);
         }
         
         return $result;
@@ -239,10 +289,10 @@ class XANDEncrypt {
         $layer3Result = $this->layer3Decrypt($encrypted, $keys['key3'], $iv);
         
         // Layer 2: Reverse bit manipulation
-        $layer2Result = $this->layer2Manipulate($layer3Result, $keys['key2']);
+        $layer2Result = $this->layer2Unmanipulate($layer3Result, $keys['key2']);
         
         // Layer 1: Reverse bitwise scrambling
-        $layer1Result = $this->layer1Scramble($layer2Result, $keys['key1']);
+        $layer1Result = $this->layer1Unscramble($layer2Result, $keys['key1']);
         
         // Remove padding
         $originalData = substr($layer1Result, 0, -$paddingLength);
