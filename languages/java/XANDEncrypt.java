@@ -111,6 +111,27 @@ public class XANDEncrypt {
     }
 
     /**
+     * First decryption layer: Reverse XOR and bit rotation operations
+     */
+    private byte[] layer1Unscramble(byte[] data, byte[] key) {
+        byte[] result = new byte[data.length];
+        
+        for (int i = 0; i < data.length; i++) {
+            byte keyByte = key[i % key.length];
+            byte dataByte = data[i];
+            
+            // Reverse the bitwise operations
+            int unscrambled = dataByte ^ (((keyByte << 1) | (keyByte >>> 7)) & 0xFF);
+            unscrambled = ((unscrambled >>> 3) | (unscrambled << 5)) & 0xFF; // Rotate right by 3
+            unscrambled = unscrambled ^ keyByte;
+            
+            result[i] = (byte) unscrambled;
+        }
+        
+        return result;
+    }
+
+    /**
      * Second encryption layer: Position-dependent bit rotation
      * Rotation amount calculated from byte position and key value
      * Conditional rotation prevents unnecessary operations when rotation is zero
@@ -134,6 +155,31 @@ public class XANDEncrypt {
             manipulated = manipulated ^ ((keyByte + i) & 0xFF);
             
             result[i] = (byte) manipulated;
+        }
+        
+        return result;
+    }
+
+    /**
+     * Second decryption layer: Reverse position-dependent bit rotation
+     */
+    private byte[] layer2Unmanipulate(byte[] data, byte[] key) {
+        byte[] result = new byte[data.length];
+        
+        for (int i = 0; i < data.length; i++) {
+            byte keyByte = key[i % key.length];
+            byte dataByte = data[i];
+            
+            // Reverse the position-dependent XOR
+            int unmanipulated = dataByte ^ ((keyByte + i) & 0xFF);
+            
+            // Reverse the bit rotation
+            int rotation = (i + (keyByte & 0xFF)) % 8;
+            if (rotation > 0) {
+                unmanipulated = ((unmanipulated >>> rotation) | (unmanipulated << (8 - rotation))) & 0xFF;
+            }
+            
+            result[i] = (byte) unmanipulated;
         }
         
         return result;
@@ -283,10 +329,10 @@ public class XANDEncrypt {
         byte[] layer3Result = layer3Decrypt(encrypted, (byte[]) keys.get("key3"), iv);
         
         // Layer 2: Reverse bit manipulation
-        byte[] layer2Result = layer2Manipulate(layer3Result, (byte[]) keys.get("key2"));
+        byte[] layer2Result = layer2Unmanipulate(layer3Result, (byte[]) keys.get("key2"));
         
         // Layer 1: Reverse bitwise scrambling
-        byte[] layer1Result = layer1Scramble(layer2Result, (byte[]) keys.get("key1"));
+        byte[] layer1Result = layer1Unscramble(layer2Result, (byte[]) keys.get("key1"));
         
         // Remove padding
         byte[] originalData = new byte[layer1Result.length - paddingLength];
