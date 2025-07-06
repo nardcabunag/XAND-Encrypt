@@ -49,7 +49,7 @@ This guide provides installation instructions for the XAND-Encrypt library acros
 #### Option 1: Direct Download
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt/languages/javascript
 
 # Install dependencies (if any)
@@ -69,7 +69,7 @@ npm install xand-encrypt
 #### Option 1: Direct Download
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt/languages/python
 
 # No external dependencies required
@@ -86,7 +86,7 @@ pip install xand-encrypt
 #### Option 1: Maven Project
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt/languages/java
 
 # Build the project
@@ -99,7 +99,7 @@ mvn exec:java -Dexec.mainClass="Example"
 #### Option 2: Direct Compilation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt/languages/java
 
 # Compile the Java files
@@ -114,7 +114,7 @@ java -cp ".:json-20231013.jar" Example
 #### Option 1: Direct Download
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt/languages/php
 
 # Run the example
@@ -131,7 +131,7 @@ composer require xand-encrypt/xand-encrypt
 #### Option 1: Cargo Project
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt/languages/rust
 
 # Build the project
@@ -154,7 +154,7 @@ cargo add xand-encrypt
 #### Option 1: Swift Package Manager
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt/languages/swift
 
 # Build the project

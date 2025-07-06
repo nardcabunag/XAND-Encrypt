@@ -71,8 +71,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/your-username/XAND-Encrypt.git</connection>
-        <developerConnection>scm:git:https://github.com/your-username/XAND-Encrypt.git</developerConnection>
-        <url>https://github.com/your-username/XAND-Encrypt</url>
+        <connection>scm:git:https://github.com/nardcabunag/XAND-Encrypt.git</connection>
+        <developerConnection>scm:git:https://github.com/nardcabunag/XAND-Encrypt.git</developerConnection>
+        <url>https://github.com/nardcabunag/XAND-Encrypt</url>
     </scm>
 </project> 

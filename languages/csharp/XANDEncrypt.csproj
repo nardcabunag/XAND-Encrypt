@@ -11,7 +11,7 @@
     <Description>Triple-layer encryption library with time-shifting keys and nonce injection</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/your-username/XAND-Encrypt.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/nardcabunag/XAND-Encrypt.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 

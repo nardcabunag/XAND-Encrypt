@@ -21,7 +21,7 @@ Thank you for your interest in contributing to XAND-Encrypt! This document provi
 
 ### 1. Fork the Repository
 ```bash
-git clone https://github.com/your-username/XAND-Encrypt.git
+git clone https://github.com/nardcabunag/XAND-Encrypt.git
 cd XAND-Encrypt
 ```
 
