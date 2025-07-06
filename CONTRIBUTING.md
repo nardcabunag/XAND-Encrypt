@@ -215,7 +215,7 @@ Use conventional commit format:
 If you discover a security vulnerability, please:
 
 1. **DO NOT** create a public issue
-2. Email security@xandencrypt.com
+2. Email jonardcabunag66@gmail.com
 3. Include detailed description of the vulnerability
 4. Provide proof-of-concept if possible
 5. Allow time for response and fix
@@ -283,6 +283,6 @@ Follow semantic versioning (SemVer):
 ### Contact
 - GitHub Issues: For bug reports and feature requests
 - GitHub Discussions: For questions and discussions
-- Email: team@xandencrypt.com
+- Email: jonardcabunag66@gmail.com
 
 Thank you for contributing to XAND-Encrypt! 
