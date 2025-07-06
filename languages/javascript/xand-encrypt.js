@@ -72,6 +72,27 @@ class XANDEncrypt {
     }
 
     /**
+     * First decryption layer: Reverse XOR and bit rotation operations
+     */
+    _layer1Unscramble(data, key) {
+        const result = Buffer.alloc(data.length);
+        
+        for (let i = 0; i < data.length; i++) {
+            const keyByte = key[i % key.length];
+            const dataByte = data[i];
+            
+            // Reverse the bit magic
+            let unscrambled = dataByte ^ ((keyByte << 1) | (keyByte >> 7)) & 0xFF;
+            unscrambled = ((unscrambled >> 3) | (unscrambled << 5)) & 0xFF; // Rotate right by 3
+            unscrambled = unscrambled ^ keyByte;
+            
+            result[i] = unscrambled;
+        }
+        
+        return result;
+    }
+
+    /**
      * Second encryption layer: Position-dependent bit rotation
      * Rotation amount calculated from byte position and key value
      * JavaScript modulo operator always returns positive values
@@ -101,13 +122,38 @@ class XANDEncrypt {
     }
 
     /**
+     * Second decryption layer: Reverse position-dependent bit rotation
+     */
+    _layer2Unmanipulate(data, key) {
+        const result = Buffer.alloc(data.length);
+        
+        for (let i = 0; i < data.length; i++) {
+            const keyByte = key[i % key.length];
+            const dataByte = data[i];
+            
+            // Reverse the position-dependent randomness
+            let unmanipulated = dataByte ^ (keyByte + i) & 0xFF;
+            
+            // Reverse the bit rotation
+            const rotation = (i + keyByte) % 8;
+            if (rotation > 0) {
+                unmanipulated = ((unmanipulated >> rotation) | (unmanipulated << (8 - rotation))) & 0xFF;
+            }
+            
+            result[i] = unmanipulated;
+        }
+        
+        return result;
+    }
+
+    /**
      * Third encryption layer: AES-256-CBC encryption
-     * Uses Node.js crypto.createCipher() with random IV generation
+     * Uses Node.js crypto.createCipheriv() with random IV generation
      * CBC mode requires unique IV for each encryption operation
      */
     _layer3Encrypt(data, key) {
         const iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipher('aes-256-cbc', key);
+        const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
         
         let encrypted = cipher.update(data);
         encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -155,32 +201,23 @@ class XANDEncrypt {
         if (typeof data === 'string') {
             data = Buffer.from(data, 'utf8');
         }
-        
         // Generate base key from password
         const baseKey = this._hashPassword(this.basePassword);
-        
         // Generate time-shifted keys
         const timestamp = Date.now();
         const keys = this._generateTimeShiftedKeys(baseKey, timestamp);
-        
         // Generate nonce and padding
         const { nonce, padding } = this._generateNonceAndPadding();
-        
         // Add padding to data
         const paddedData = Buffer.concat([data, padding]);
-        
         // Layer 1: Bitwise scrambling
         const layer1Result = this._layer1Scramble(paddedData, keys.key1);
-        
         // Layer 2: Advanced bit manipulation
         const layer2Result = this._layer2Manipulate(layer1Result, keys.key2);
-        
         // Layer 3: AES encryption
         const layer3Result = this._layer3Encrypt(layer2Result, keys.key3);
-        
         // Apply key decay
         this._applyKeyDecay(keys);
-        
         // Combine all components
         const result = {
             encrypted: layer3Result.encrypted.toString('base64'),
@@ -189,7 +226,6 @@ class XANDEncrypt {
             timestamp: timestamp,
             paddingLength: padding.length
         };
-        
         return JSON.stringify(result);
     }
 
@@ -198,36 +234,26 @@ class XANDEncrypt {
      */
     decrypt(encryptedData) {
         const data = JSON.parse(encryptedData);
-        
         // Parse components
         const encrypted = Buffer.from(data.encrypted, 'base64');
         const iv = Buffer.from(data.iv, 'base64');
         const nonce = Buffer.from(data.nonce, 'base64');
         const timestamp = data.timestamp;
         const paddingLength = data.paddingLength;
-        
         // Generate base key from password
         const baseKey = this._hashPassword(this.basePassword);
-        
         // Regenerate time-shifted keys (must use same timestamp)
         const keys = this._generateTimeShiftedKeys(baseKey, timestamp);
-        
         // Layer 3: AES decryption
-        const decipher = crypto.createDecipher('aes-256-cbc', keys.key3);
-        decipher.setAutoPadding(false);
-        
+        const decipher = crypto.createDecipheriv('aes-256-cbc', keys.key3, iv);
         let layer3Result = decipher.update(encrypted);
         layer3Result = Buffer.concat([layer3Result, decipher.final()]);
-        
         // Layer 2: Reverse bit manipulation
-        const layer2Result = this._layer2Manipulate(layer3Result, keys.key2);
-        
+        const layer2Result = this._layer2Unmanipulate(layer3Result, keys.key2);
         // Layer 1: Reverse bitwise scrambling
-        const layer1Result = this._layer1Scramble(layer2Result, keys.key1);
-        
+        const layer1Result = this._layer1Unscramble(layer2Result, keys.key1);
         // Remove padding
         const originalData = layer1Result.slice(0, -paddingLength);
-        
         return originalData.toString('utf8');
     }
 

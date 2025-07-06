@@ -179,35 +179,55 @@ class XANDEncrypt:
         
         return json.dumps(result)
 
+    def _layer1_unscramble(self, data: bytes, key: bytes) -> bytes:
+        """First decryption layer: Reverse XOR and bit rotation operations"""
+        result = bytearray(len(data))
+        for i in range(len(data)):
+            key_byte = key[i % len(key)]
+            data_byte = data[i]
+            # Reverse the bit magic
+            unscrambled = data_byte ^ (((key_byte << 1) | (key_byte >> 7)) & 0xFF)
+            unscrambled = ((unscrambled >> 3) | (unscrambled << 5)) & 0xFF  # Rotate right by 3
+            unscrambled = unscrambled ^ key_byte
+            result[i] = unscrambled
+        return bytes(result)
+
+    def _layer2_unmanipulate(self, data: bytes, key: bytes) -> bytes:
+        """Second decryption layer: Reverse position-dependent bit rotation"""
+        result = bytearray(len(data))
+        for i in range(len(data)):
+            key_byte = key[i % len(key)]
+            data_byte = data[i]
+            # Reverse the position-dependent randomness
+            unmanipulated = data_byte ^ ((key_byte + i) & 0xFF)
+            # Reverse the bit rotation
+            rotation = (i + key_byte) % 8
+            if rotation > 0:
+                unmanipulated = ((unmanipulated >> rotation) | (unmanipulated << (8 - rotation))) & 0xFF
+            result[i] = unmanipulated
+        return bytes(result)
+
     def decrypt(self, encrypted_data: str) -> str:
         """Decrypt data using triple-layer decryption"""
         data = json.loads(encrypted_data)
-        
         # Parse components
         encrypted = base64.b64decode(data['encrypted'])
         iv = base64.b64decode(data['iv'])
         nonce = base64.b64decode(data['nonce'])
         timestamp = data['timestamp']
         padding_length = data['padding_length']
-        
         # Generate base key from password
         base_key = self._hash_password(self.base_password)
-        
         # Regenerate time-shifted keys (must use same timestamp)
         keys = self._generate_time_shifted_keys(base_key, timestamp)
-        
         # Layer 3: AES decryption
         layer3_result = self._layer3_decrypt(encrypted, keys['key3'], iv)  # type: ignore
-        
         # Layer 2: Reverse bit manipulation
-        layer2_result = self._layer2_manipulate(layer3_result, keys['key2'])  # type: ignore
-        
+        layer2_result = self._layer2_unmanipulate(layer3_result, keys['key2'])  # type: ignore
         # Layer 1: Reverse bitwise scrambling
-        layer1_result = self._layer1_scramble(layer2_result, keys['key1'])  # type: ignore
-        
+        layer1_result = self._layer1_unscramble(layer2_result, keys['key1'])  # type: ignore
         # Remove padding
         original_data = layer1_result[:-padding_length]
-        
         return original_data.decode('utf-8')
 
     def generate_key_pair(self):
