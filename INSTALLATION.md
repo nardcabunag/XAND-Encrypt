@@ -295,13 +295,13 @@ export XAND_ENCRYPT_KEY_SIZE=32
 1. **Documentation**: Check the [README.md](README.md) and [docs/](docs/) directory
 2. **Issues**: Report bugs on GitHub Issues
 3. **Discussions**: Ask questions on GitHub Discussions
-4. **Email**: Contact team@xandencrypt.com
+4. **Email**: Contact jonardcabunag66@gmail.com
 
 ### Contributing
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing to the project.
 
 ### Security Reporting
-For security vulnerabilities, email security@xandencrypt.com instead of creating public issues.
+For security vulnerabilities, email jonardcabunag66@gmail.com instead of creating public issues.
 
 ## License
 
