@@ -12,7 +12,7 @@ The system operates on a **password-based key derivation** foundation, where you
 
 1. **Single Password Control**: One strong password controls all encryption
 2. **No Key Storage**: Keys are derived on-demand, never stored
-3. **Cross-Language Compatibility**: Same password produces identical results across all languages
+3. **Cross-Language Compatibility**
 
 ### The Triple-Layer Encryption Process
 
