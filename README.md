@@ -53,7 +53,7 @@ The system operates on a **password-based key derivation** foundation, where you
 **What Happens:**
 1. Random 16-byte initialization vector (IV) is generated
 2. Data is encrypted using AES-256 in CBC mode with `key3`
-3. Random padding (1-16 bytes) is added based on nonce
+3. Random padding (1-16 bytes) is added based on nonce (pending)
 4. Final encrypted data includes IV and padding information
 
 **Security Benefits:**
@@ -294,7 +294,7 @@ var decrypted = encryptor.Decrypt(encrypted);
 - **Triple-Layer Encryption**: Three distinct encryption layers for maximum security
 - **Time-Shifting Keys**: Dynamic key generation based on time and original key
 - **Random Nonce Injection**: Unique output for every encryption operation
-- **Random Padding**: Variable padding derived from the nonce
+- **Random Padding**: Variable padding derived from the nonce (pending)
 - **Key Decay**: Keys are modified after each use to prevent replay attacks
 - **Bitwise Scrambling**: Advanced bit manipulation for enhanced security
 - **Password-Based**: User password serves as the foundation key
