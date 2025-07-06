@@ -1,0 +1,9 @@
+# Core dependencies for XAND-Encrypt Python implementation
+# Note: This implementation uses only standard library modules
+# No external dependencies required for basic functionality
+
+# Optional: For enhanced cryptography (uncomment if using cryptography library)
+# cryptography>=3.4.8
+
+# Optional: For JSON handling (already included in standard library)
+# No additional requirements needed 
